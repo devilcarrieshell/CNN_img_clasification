@@ -1,33 +1,28 @@
-import streamlit as st
 import torch
-import torchvision.transforms as transforms
-from PIL import Image
-from model import load_model  # Importă modelul salvat
+import torch.nn as nn
 
-# Încărcarea modelului
-model = load_model("cifar10_model.pth")
+# Definim modelul folosit la antrenare
+class ConvNet(nn.Module):
+    def __init__(self):
+        super(ConvNet, self).__init__()
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.fc1 = nn.Linear(64 * 8 * 8, 256)
+        self.fc2 = nn.Linear(256, 10)
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(2, 2)
 
-# Configurare Streamlit
-st.title("Clasificare CIFAR-10")
-st.write("Încarcă o imagine pentru clasificare!")
+    def forward(self, x):
+        x = self.pool(self.relu(self.conv1(x)))
+        x = self.pool(self.relu(self.conv2(x)))
+        x = x.view(x.size(0), -1)
+        x = self.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
 
-uploaded_file = st.file_uploader("Alege o imagine...", type=["jpg", "png", "jpeg"])
-
-if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Imagine Încărcată", use_column_width=True)
-
-    # Transformare pentru model
-    transform = transforms.Compose([
-        transforms.Resize((32, 32)),
-        transforms.ToTensor(),
-    ])
-
-    image_tensor = transform(image).unsqueeze(0)  # Adăugăm batch dimension
-
-    # Clasificare
-    with torch.no_grad():
-        output = model(image_tensor)
-        prediction = torch.argmax(output, 1).item()
-
-    st.write(f"Predicție: **{prediction}**")
+# Funcție pentru încărcarea modelului salvat
+def load_model(model_path="cifar10_model.pth"):
+    model = ConvNet()
+    model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
+    model.eval()  # Setăm modelul în modul de evaluare
+    return model
