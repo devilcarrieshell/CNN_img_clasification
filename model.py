@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 
-# Definim modelul folosit la antrenare
-class ConvNet(nn.Module):
+class cifar10_model(nn.Module):
     def __init__(self):
         super(ConvNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
@@ -20,9 +19,8 @@ class ConvNet(nn.Module):
         x = self.fc2(x)
         return x
 
-# Funcție pentru încărcarea modelului salvat
 def load_model(model_path="cifar10_model.pth"):
     model = ConvNet()
     model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
-    model.eval()  # Setăm modelul în modul de evaluare
+    model.eval()
     return model

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificare Imagini</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .container { margin-top: 50px; }
+        img { max-width: 300px; margin-top: 10px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Clasificare Imagini</h2>
+        <input type="file" id="imageInput" accept="image/*">
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        const labels = {
+            "1": "Avion",
+            "2": "Pisică",
+            "3": "Căprioară",
+            "4": "Cal",
+            "5": "Câine",
+            "6": "Camion"
+        };
+        
+        document.getElementById("imageInput").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fileName = file.name.split(".")[0];
+                    const label = labels[fileName] || "Necunoscut";
+                    document.getElementById("result").innerHTML = `
+                        <p>Imaginea încărcată: ${file.name}</p>
+                        <img src="${e.target.result}" alt="Imagine Încărcată">
+                        <h3>Clasificare: ${label}</h3>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
