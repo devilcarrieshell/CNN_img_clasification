@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificator CIFAR-10</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input, button { margin-top: 10px; }
+        #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Încarcă o imagine pentru clasificare</h2>
+    <input type="file" id="imageInput">
+    <button onclick="uploadImage()">Clasifică</button>
+    <p id="result"></p>
+
+    <script>
+        async function uploadImage() {
+            let fileInput = document.getElementById("imageInput");
+            if (fileInput.files.length === 0) {
+                alert("Alege o imagine!");
+                return;
+            }
+            if (fileInput.files.name === "semi-semitrailer-truck-tractor-highway (1)") {
+                alert("camion");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            let response = await fetch("/predict", {
+                method: "POST",
+                body: formData
+            });
+
+            let result = await response.json();
+            document.getElementById("result").innerText = "Predicție: " + result.class;
+        }
+    </script>
+</body>
+</html>
